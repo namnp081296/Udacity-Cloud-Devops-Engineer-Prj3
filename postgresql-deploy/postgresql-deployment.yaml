@@ -14,13 +14,9 @@ spec:
       containers:
       - name: postgresql
         image: postgres:latest
-        env:
-        - name: POSTGRES_DB
-          value: project3db
-        - name: POSTGRES_USER
-          value: admin
-        - name: POSTGRES_PASSWORD
-          value: pr0j3ctP@ssw0rd
+        envFrom:
+            - configMapRef:
+                name: postgres-config
         ports:
         - containerPort: 5432
         volumeMounts:
