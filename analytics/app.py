@@ -46,11 +46,23 @@ def get_daily_visits():
 
         app.logger.info(response)
 
-    return response
+    return jsonify(response)
 
 
 @app.route("/api/reports/daily_usage", methods=["GET"])
 def daily_visits():
+    result = db.session.execute(text("""
+    SELECT Date(created_at) AS date,
+        Count(*) AS visits
+    FROM   tokens
+    WHERE  used_at IS NOT NULL
+    GROUP  BY Date(created_at)
+    """))
+
+    response {}
+    for row in result:
+        response[str(row[0])] = row [1]
+
     return jsonify(get_daily_visits)
 
 

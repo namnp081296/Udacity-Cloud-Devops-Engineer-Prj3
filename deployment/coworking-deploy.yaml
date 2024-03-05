@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: coworking
-        image: 583005056124.dkr.ecr.us-east-1.amazonaws.com/coworking-checkin:0.0.1
+        image: 583005056124.dkr.ecr.us-east-1.amazonaws.com/coworking-checkin:1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -50,7 +50,7 @@ spec:
         - name: DB_PORT
           value: "5432"
         - name: DB_NAME
-          value: project3db
+          value: postgres
         - name: DB_USERNAME
           value: admin
         - name: DB_PASSWORD
