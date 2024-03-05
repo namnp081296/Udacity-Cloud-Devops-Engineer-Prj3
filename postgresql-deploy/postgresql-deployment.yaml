@@ -15,8 +15,8 @@ spec:
       - name: postgresql
         image: postgres:latest
         envFrom:
-            - configMapRef:
-                name: postgres-config
+          - configMapRef:
+              name: postgresql-config
         ports:
         - containerPort: 5432
         volumeMounts:
