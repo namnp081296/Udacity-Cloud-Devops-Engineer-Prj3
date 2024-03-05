@@ -49,6 +49,8 @@ spec:
           value: service/postgresql-service
         - name: DB_PORT
           value: "5432"
+        - name: DB_NAME
+          value: project3db
         - name: DB_USERNAME
           value: admin
         - name: DB_PASSWORD
@@ -56,6 +58,4 @@ spec:
             secretKeyRef:
               name: secret-postgresql
               key: POSTGRES_PASSWORD
-        - name: DB_NAME
-          value: project3db
       restartPolicy: Always
