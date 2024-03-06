@@ -20,7 +20,7 @@ def health_check():
 
 @app.route("/readiness_check")
 def readiness_check():
-    return "OK"
+    return "ok"
     # try:
     #     count = db.session.query(Token).count()
     # except Exception as e:
