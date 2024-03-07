@@ -6,7 +6,9 @@ WORKDIR /src
 
 COPY ./analytics/requirements.txt requirements.txt
 
-RUN pip install -r requirements.txt
+RUN apt-get update -y
+# RUN pip install -r requirements.txt
+RUN pip install --upgrade -r requirements.txt
 
 COPY ./analytics .
 
