@@ -46,13 +46,25 @@ spec:
           timeoutSeconds: 5
         env:
         - name: DB_HOST
-          value: project3-postgres-postgresql
+          valueFrom:
+            configMapKeyRef:
+              name: postgresql-config
+              key: DB_HOST
         - name: DB_PORT
-          value: "5432"
+          valueFrom:
+            configMapKeyRef:
+              name: postgresql-config
+              key: DB_PORT
         - name: DB_NAME
-          value: postgres
+          valueFrom:
+            configMapKeyRef:
+              name: postgresql-config
+              key: DB_NAME
         - name: DB_USERNAME
-          value: postgres
+          valueFrom:
+            configMapKeyRef:
+              name: postgresql-config
+              key: DB_USERNAME
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
