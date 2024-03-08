@@ -5,7 +5,7 @@ metadata:
   labels:
     app: postgres
 data:
-  POSTGRES_DB: postgres
-  POSTGRES_USER: postgres
-  # POSTGRES_PASSWORD: password123
-  POSTGRES_PASSWORD: BGjnWtmKXh
+  DB_HOST: project3-postgres-postgresql
+  DB_PORT: 5432
+  DB_NAME: postgres
+  DB_USERNAME: postgres
