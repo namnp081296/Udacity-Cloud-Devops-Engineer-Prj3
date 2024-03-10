@@ -289,8 +289,6 @@ Fill in your Policy name you want and then click the **Create policy** button
 
 ![image-20240306142553896](C:\Users\YetMaHaiBon\AppData\Roaming\Typora\typora-user-images\image-20240306142553896.png)
 
-as
-
 Before deploy The coworking application, firstly we need to create both Configmap for storing DB information including username, port, database name, service name and Secret for storing db password
 
 **postgresql-configmap.yaml**
@@ -326,6 +324,35 @@ data:
 POSTGRES_PASSWORD can be get by using command **echo "<Your Initiated Postgres Password>" | base64**
 
 Running **kubectl apply -f** for each of file you've created
+
+Edit the config.py
+
+```
+import logging
+import os
+
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+#db_username = os.environ["DB_USERNAME"]
+#db_password = os.environ["DB_PASSWORD"]
+db_username = os.environ.get("DB_USERNAME", "your db username")
+db_password = os.environ.get("DB_PASSWORD", "your initiated postgres password")
+# db_host = os.environ.get("DB_HOST", "127.0.0.1")
+db_host = os.environ.get("DB_HOST", "postgres-service-created-by-helm")
+db_port = os.environ.get("DB_PORT", "your db port")
+db_name = os.environ.get("DB_NAME", "your db name")
+
+app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}"
+
+db = SQLAlchemy(app)
+
+app.logger.setLevel(logging.DEBUG)
+
+```
+
+Save the file and then commit and push to the Github
 
 Next, we'll go to the AWS CodeBuild page to run the first build by clicking the button **Start Build** and then wait for the build success. After the build success you can see
 
@@ -416,19 +443,60 @@ spec:
 
 ```
 
+Save it and then run the command **kubectl apply -f** to deploy the coworking application. Wait a moment till the application deployed. After that run **kubectl get pod** to check if the coworking pod running or not
 
+![image-20240310213515118](C:\Users\YetMaHaiBon\AppData\Roaming\Typora\typora-user-images\image-20240310213515118.png)
 
+Get the coworking service by running comand **kubectl get svc**
 
+![image-20240310213651747](C:\Users\YetMaHaiBon\AppData\Roaming\Typora\typora-user-images\image-20240310213651747.png)
 
+Copy the External-IP of coworking and then open the browser then paste it following the format
 
+`<external-ip>:5153//api/reports/uer_visits`
 
+![image-20240310213942829](C:\Users\YetMaHaiBon\AppData\Roaming\Typora\typora-user-images\image-20240310213942829.png)
 
+## Configure log stream to Cloudwatch from Coworking Pod
 
+You can prefer via [link](https://archive.eksworkshop.com/advanced/330_servicemesh_using_appmesh/add_nodegroup_fargate/cloudwatch_setup/), and remember to replace the current cluster name of the command with your cluster name before run it.
 
+When you get into this step, run this following command to get this file into your local machine
 
+curl -s https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insights/latest/k8s-deployment-manifest-templates/deployment-mode/daemonset/container-insights-monitoring/quickstart/cwagent-fluentd-quickstart.yaml
 
+Open it and replace following these lines:
 
+![image-20240310215747333](C:\Users\YetMaHaiBon\AppData\Roaming\Typora\typora-user-images\image-20240310215747333.png)
 
+![image-20240310215854531](C:\Users\YetMaHaiBon\AppData\Roaming\Typora\typora-user-images\image-20240310215854531.png)
+
+![image-20240310215925881](C:\Users\YetMaHaiBon\AppData\Roaming\Typora\typora-user-images\image-20240310215925881.png)
+
+![image-20240310215959699](C:\Users\YetMaHaiBon\AppData\Roaming\Typora\typora-user-images\image-20240310215959699.png)
+
+![image-20240310220017209](C:\Users\YetMaHaiBon\AppData\Roaming\Typora\typora-user-images\image-20240310220017209.png)
+
+Save it and then run the command **kubectl apply -f** to deploy the agent
+
+If you get this error while you deploying
+
+> **AccessDeniedException**: User: arn:aws:sts::<AWS Account ID>:assumed-role/eksctl-<cluster-name>-nodegroup--NodeInstanceRole-<Random Code>/i-<Randomcode> is not authorized to perform: logs:PutLogEvents on resource: arn:aws:logs:us-east-1:<AWS Account ID>:log-group:/aws/containerinsights/<cluster-name>/performance:log-stream:ip-<Random IP Node>.ec2.internal because no identity-based policy allows the logs:PutLogEvents action
+
+This is an AWS CloudWatch Logs access permission issue. 
+
+To resolve this issue, you need to update the AWS Identity and Access Management (IAM) role policies associated with the assumed role `arn:aws:sts::<AWS Account ID>:assumed-role/eksctl-<cluster-name>-nodegroup--NodeInstanceRole-<Random Code>/i-<random code>` to grant the necessary permissions for CloudWatch Logs.
+
+Here are the general steps to resolve the issue:
+
+1. **Identify the IAM Role:** Identify the IAM role `eksctl-<cluster-name>-nodegroup--NodeInstanceRole-<random code>` associated with your EKS nodes.
+2. **Update IAM Role Policies:** Update the IAM role policies associated with the identified role to include the necessary permissions for CloudWatch Logs.
+   - Open the AWS Management Console.
+   - Navigate to the IAM service.
+   - In the left navigation pane, choose "Roles."
+   - Search for and select the role named `eksctl-<cluster-name>-nodegroup--NodeInstanceRole-<random code>`.
+   - Choose the "Permissions" tab.
+   - Attach a policy that includes permissions for CloudWatch Logs. For example, you can attach the `CloudWatchLogsFullAccess` policy for testing purposes, and later refine the permissions based on your specific needs.
 
 
 
